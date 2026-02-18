@@ -97,17 +97,17 @@ class LiteTensorMapperBlock(nn.Module):
     def forward(self, x):
 
 
-        memorypath, FFpath = x, x
+        memorypath, FeedForwardpath = x, x
 
         memorypath = self.norm_1(memorypath)
 
         memorypath = self.memory(memorypath)
 
-        FFpath = self.norm_2(FFpath)
+        FeedForwardpath = self.norm_2(FeedForwardpath)
 
-        FFpath = self.feedforward(FFpath)
+        FeedForwardpath = self.feedforward(FeedForwardpath)
 
-        x = memorypath + FFpath
+        x = memorypath + FeedForwardpath
 
         return x
 

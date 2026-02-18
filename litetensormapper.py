@@ -24,11 +24,11 @@ class VecDyGeluSine(nn.Module):
         self.alpha = nn.Parameter(torch.randn(input_shape))
         self.beta = nn.Parameter(torch.randn(input_shape))
         self.gamma = nn.Parameter(torch.randn(1))
-        self.etta = nn.Parameter(torch.randn(1))
+        self.eta = nn.Parameter(torch.randn(1))
         self.gelu = nn.GELU()
 
     def forward(self, x):
-        x = self.gamma * self.gelu(self.alpha * x) + self.etta * torch.sin(self.beta * x)
+        x = self.gamma * self.gelu(self.alpha * x) + self.eta * torch.sin(self.beta * x)
 
         return x
 

@@ -2,7 +2,6 @@ import torch
 from torch import nn, Tensor
 
 
-
 class VecDyT(nn.Module):
     def __init__(self, input_shape):
 
@@ -23,13 +22,33 @@ class VecDyGeluSine(nn.Module):
         self.alpha = nn.Parameter(torch.randn(input_shape))
         self.beta = nn.Parameter(torch.randn(input_shape))
         self.gamma = nn.Parameter(torch.randn(1))
-        self.eta = nn.Parameter(torch.randn(1))
+        self.etta = nn.Parameter(torch.randn(1))
         self.gelu = nn.GELU()
 
     def forward(self, x):
-        x = self.gamma * self.gelu(self.alpha * x) + self.eta * torch.sin(self.beta * x)
+
+        x = self.gamma * self.gelu(self.alpha * x) + self.etta * torch.sin(self.beta * x)
 
         return x
+
+class FFUnit(nn.Module):
+    def __init__(self,dim):
+
+        super().__init__()
+
+        self.proj =  nn.Linear(dim,dim,bias=False)
+        self.modulate = VecDyGeluSine(dim)
+
+
+    def forward(self, x):
+
+        u, v = x, x
+
+        u = self.modulate(u)
+        v = self.proj(v)
+        g = u * v
+
+        return g
 
 
 
@@ -64,12 +83,12 @@ class TTT(nn.Module):
 
         return out
 
-class FFUnit(nn.Module):
+class FFUnit_TTT(nn.Module):
     def __init__(self,dim):
 
         super().__init__()
 
-        self.proj =  nn.Linear(dim,dim,bias=False)
+        self.proj = TTT(dim)
         self.modulate = VecDyGeluSine(dim)
 
 
@@ -90,24 +109,28 @@ class LiteTensorMapperBlock(nn.Module):
 
         self.norm_1 =  VecDyT(dim)
         self.norm_2 =  VecDyT(dim)
-        self.memory = TTT(dim)
+        self.memory = FFUnit_TTT(dim)
         self.feedforward = FFUnit(dim)
 
 
     def forward(self, x):
 
 
-        memorypath, FeedForwardpath = x, x
+        memorypath,residual = x, x
 
         memorypath = self.norm_1(memorypath)
 
         memorypath = self.memory(memorypath)
 
-        FeedForwardpath = self.norm_2(FeedForwardpath)
+        x = memorypath + residual
 
-        FeedForwardpath = self.feedforward(FeedForwardpath)
+        FFpath, residual = x, x
 
-        x = memorypath + FeedForwardpath
+        FFpath = self.norm_2(FFpath)
+
+        FFpath = self.feedforward(FFpath)
+
+        x = FFpath + residual
 
         return x
 

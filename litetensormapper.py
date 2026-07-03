@@ -102,7 +102,7 @@ class FFUnit_TTT(nn.Module):
         return g
 
 class LiteTensorMapperBlock(nn.Module):
-    def __init__(self, dim, num_patch):
+    def __init__(self, dim):
 
         super().__init__()
 
@@ -135,11 +135,11 @@ class LiteTensorMapperBlock(nn.Module):
 
 
 class LiteTensorMapper(nn.Module):
-    def __init__(self, d_model,num_patch, num_layers):
+    def __init__(self, d_model, num_layers):
         super().__init__()
 
         self.model = nn.Sequential(
-            *[LiteTensorMapperBlock(d_model,num_patch) for _ in range(num_layers)]
+            *[LiteTensorMapperBlock(d_model) for _ in range(num_layers)]
         )
 
     def forward(self, x):

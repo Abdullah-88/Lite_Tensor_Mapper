@@ -1,7 +1,6 @@
 import torch
 from torch import nn, Tensor
 
-
 class VecDyT(nn.Module):
     def __init__(self, input_shape):
 

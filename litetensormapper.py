@@ -12,7 +12,6 @@ class VecDyT(nn.Module):
         x = torch.tanh(self.alpha * x)
         return x
 
-
 class VecDyGeluSine(nn.Module):
     def __init__(self, input_shape):
 
@@ -38,7 +37,6 @@ class FFUnit(nn.Module):
         self.proj =  nn.Linear(dim,dim,bias=False)
         self.modulate = VecDyGeluSine(dim)
 
-
     def forward(self, x):
 
         u, v = x, x
@@ -49,8 +47,6 @@ class FFUnit(nn.Module):
 
         return g
 
-
-
 class TTT(nn.Module):
     def __init__(self, dim: int):
 
@@ -59,7 +55,6 @@ class TTT(nn.Module):
         self.mapping = nn.Linear(dim,dim,bias=False)
 
     def forward(self, in_seq: Tensor) -> Tensor:
-
 
         outs = []
 
@@ -90,7 +85,6 @@ class FFUnit_TTT(nn.Module):
         self.proj = TTT(dim)
         self.modulate = VecDyGeluSine(dim)
 
-
     def forward(self, x):
 
         u, v = x, x
@@ -111,9 +105,7 @@ class LiteTensorMapperBlock(nn.Module):
         self.memory = FFUnit_TTT(dim)
         self.feedforward = FFUnit(dim)
 
-
     def forward(self, x):
-
 
         memorypath,residual = x, x
 
@@ -132,7 +124,6 @@ class LiteTensorMapperBlock(nn.Module):
         x = FFpath + residual
 
         return x
-
 
 class LiteTensorMapper(nn.Module):
     def __init__(self, d_model, num_layers):

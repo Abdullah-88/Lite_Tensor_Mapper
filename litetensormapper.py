@@ -30,11 +30,11 @@ class VecDyGeluSine(nn.Module):
         return x
 
 class FFUnit(nn.Module):
-    def __init__(self,dim):
+    def __init__(self, dim):
 
         super().__init__()
 
-        self.proj =  nn.Linear(dim,dim,bias=False)
+        self.proj = nn.Linear(dim, dim, bias = False)
         self.modulate = VecDyGeluSine(dim)
 
     def forward(self, x):
@@ -52,7 +52,7 @@ class TTT(nn.Module):
 
         super(TTT, self).__init__()
 
-        self.mapping = nn.Linear(dim,dim,bias=False)
+        self.mapping = nn.Linear(dim, dim, bias = False)
 
     def forward(self, in_seq: Tensor) -> Tensor:
 
@@ -65,7 +65,7 @@ class TTT(nn.Module):
             label_view = state
             loss = nn.functional.mse_loss(self.mapping(train_view), label_view)
             grads = torch.autograd.grad(
-                loss, self.mapping.parameters(),create_graph=True)
+                loss, self.mapping.parameters(), create_graph = True)
             with torch.no_grad():
                 for param, grad in zip(self.mapping.parameters(), grads):
 
@@ -73,12 +73,12 @@ class TTT(nn.Module):
 
             readout = self.mapping(in_seq[:,seq,:]).detach()
             outs.append(readout)
-        out = torch.stack(outs, dim=1)
+        out = torch.stack(outs, dim = 1)
 
         return out
 
 class FFUnit_TTT(nn.Module):
-    def __init__(self,dim):
+    def __init__(self, dim):
 
         super().__init__()
 
@@ -107,21 +107,21 @@ class LiteTensorMapperBlock(nn.Module):
 
     def forward(self, x):
 
-        memorypath,residual = x, x
+        residual = x
 
-        memorypath = self.norm_1(memorypath)
+        x = self.norm_1(x)
 
-        memorypath = self.memory(memorypath)
+        x = self.memory(x)
 
-        x = memorypath + residual
+        x = x + residual
 
-        FFpath, residual = x, x
+        residual = x
 
-        FFpath = self.norm_2(FFpath)
+        x = self.norm_2(x)
 
-        FFpath = self.feedforward(FFpath)
+        x = self.feedforward(x)
 
-        x = FFpath + residual
+        x = x + residual
 
         return x
 
